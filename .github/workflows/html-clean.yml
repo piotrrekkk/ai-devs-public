@@ -1,30 +1,27 @@
 
-name: Clean HTML from Input
+name: Clean HTML File
 
 on:
-  workflow_dispatch:
-    inputs:
-      html_text:
-        description: "Paste your HTML content here"
-        required: true
-        type: string
+  push:
+    paths:
+      - 'input-html/**'  # Trigger only when files in this folder change
 
 jobs:
   clean-html:
     runs-on: ubuntu-latest
     steps:
-      - name: Clean HTML
-        run: |
-          # Save input to a file
-          echo "${{ github.event.inputs.html_text }}" > raw.html
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-          # Replace \" with "
-          sed -i 's/\\"/"/g' raw.html
-          # Remove \n
-          sed -i 's/\\n//g' raw.html
+      - name: Clean all HTML files in input-html
+        run: |
+          for file in input-html/*.html; do
+            sed -i 's/\\"/"/g' "$file"
+            sed -i 's/\\n//g' "$file"
+          done
 
       - name: Upload cleaned HTML
         uses: actions/upload-artifact@v3
         with:
           name: cleaned-html
-          path: raw.html
+          path: input-html/
