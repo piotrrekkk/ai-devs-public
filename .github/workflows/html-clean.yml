@@ -1,28 +1,30 @@
-name: Clean HTML and Upload Artifact
+
+name: Clean HTML from Input
 
 on:
-  workflow_dispatch: # Manual trigger from GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      html_text:
+        description: "Paste your HTML content here"
+        required: true
+        type: string
 
 jobs:
   clean-html:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout repository
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Step 2: Clean HTML file
-      - name: Clean HTML content
+      - name: Clean HTML
         run: |
-          # Replace \" with "
-          sed -i 's/\\"/"/g' path/to/your.html
-          # Remove \n
-          sed -i 's/\\n//g' path/to/your.html
+          # Save input to a file
+          echo "${{ github.event.inputs.html_text }}" > raw.html
 
-      # Step 3: Upload cleaned file as artifact
+          # Replace \" with "
+          sed -i 's/\\"/"/g' raw.html
+          # Remove \n
+          sed -i 's/\\n//g' raw.html
+
       - name: Upload cleaned HTML
         uses: actions/upload-artifact@v3
         with:
           name: cleaned-html
-          path: path/to/your.html
+          path: raw.html
