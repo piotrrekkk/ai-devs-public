@@ -1,27 +1,23 @@
 
-name: Clean HTML File
+name: Format HTML and Upload Artifact
 
 on:
-  push:
-    paths:
-      - 'input-html/**'  # Trigger only when files in this folder change
+  workflow_dispatch:
+    inputs:
+      html_content:
+        description: 'Paste your HTML content'
+        required: true
 
 jobs:
-  clean-html:
+  format-html:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Clean all HTML files in input-html
+      - name: Create formatted HTML file
         run: |
-          for file in input-html/*.html; do
-            sed -i 's/\\"/"/g' "$file"
-            sed -i 's/\\n//g' "$file"
-          done
+          echo "${{ github.event.inputs.html_content }}" \
+          | sed 's/\\"/"/g; s/\\n//g' > output.html
 
-      - name: Upload cleaned HTML
-        uses: actions/upload-artifact@v3
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: cleaned-html
-          path: input-html/
+          name: formatted-html
