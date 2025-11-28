@@ -1,23 +1,24 @@
 
-name: Format HTML and Upload Artifact
+name: Format HTML from Uploaded File
 
 on:
   workflow_dispatch:
-    inputs:
-      html_content:
-        description: 'Paste your HTML content'
-        required: true
 
 jobs:
   format-html:
     runs-on: ubuntu-latest
     steps:
-      - name: Create formatted HTML file
-        run: |
-          echo "${{ github.event.inputs.html_content }}" \
-          | sed 's/\\"/"/g; s/\\n//g' > output.html
+      - name: Download uploaded file
+        uses: actions/download-artifact@v4
+        with:
+          name: html-input
+          path: .
 
-      - name: Upload artifact
+      - name: Process HTML
+        run: |
+          sed 's/\\"/"/g; s/\\n//g' input.html > output.html
+
+      - name: Upload formatted HTML
         uses: actions/upload-artifact@v4
         with:
           name: formatted-html
